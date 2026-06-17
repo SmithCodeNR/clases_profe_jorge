@@ -14,9 +14,33 @@
   <section class="card">
     <h3>PRODUCTOS</h3>
 
+    <img id="imgProducto" src="" alt="Producto" class="img-producto">
+
     <section class="form-grid">
       <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" />
+      <select name="nombre" id="nombre">
+        <option value="tomate">tomate</option>
+        <option value="papasfritas">papas fritas</option>
+        <option value="cebolla">cebolla</option>
+        <option value="lechuga">lechuga</option>
+        <option value="maracuya">maracuya</option>
+        <option value="lulo">lulo</option>
+        <option value="yuca">yuca</option>
+        <option value="ajo">ajo</option>
+        <option value="papacriolla">papa criolla</option>
+        <option value="manzanaverde">manzana verde</option>
+        <option value="naranja">naranja</option>
+        <option value="manzanaroja">manzana roja</option>
+        <option value="sandia">sandia</option>
+        <option value="banano">banano</option>
+        <option value="mora">mora</option>
+        <option value="fresa">fresa</option>
+        <option value="arandano">arandano</option>
+        <option value="papaya">papaya</option>
+        <option value="paltanoverde">platano verde</option>
+        <option value="piña">piña</option>
+        <option value="pera">pera</option>
+      </select>
       <section></section> <!-- Celda vacía para mantener alineación -->
       <label for="cantidad">Cantidad:</label>
       <input type="number" id="cantidad" />
@@ -46,7 +70,6 @@
     <section class="total" id="totalGeneral">Total general: $0</section>
   </section>
 
-  <script src="inventario.js" defer></script>
+  <script src="inventario.js"></script>
 </body>
-
 </html>
