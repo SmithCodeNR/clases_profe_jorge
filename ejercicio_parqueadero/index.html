@@ -1,117 +1,949 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="parqueadero.css">
-    <title>Parqueadero Parchese</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atenea · Terminal de Parqueadero</title>
+<style>
+  :root{
+    --bg:#10141a;
+    --bg-soft:#171c24;
+    --panel:#1b212b;
+    --line:#2a3140;
+    --ink:#e9edf3;
+    --ink-dim:#8b95a5;
+    --gold:#c9a24b;
+    --gold-soft:#e8cf8f;
+    --mint:#4abf8a;
+    --terracota:#d6573f;
+    --paper:#f3efe4;
+    --paper-ink:#262119;
+    --mono: 'Atenea Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    --sans: 'Atenea Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,162,75,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 100% 100%, rgba(74,191,138,0.06), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding:32px 20px 60px;
+  }
+
+  /* ---------- Type ---------- */
+  @font-face{ font-family:'Atenea Sans'; src:local('Inter'); }
+
+  h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-0.01em; }
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+
+  /* ---------- Header ---------- */
+  .wrap{ max-width:1080px; margin:0 auto; }
+
+  header.top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:30px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+
+  .brand{ display:flex; align-items:center; gap:14px; }
+
+  .brand-mark{
+    width:46px;height:46px;
+    border-radius:10px;
+    background:linear-gradient(155deg,#22293480,#10141a);
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .brand-mark svg{ width:26px; height:26px; }
+
+  .brand h1{ font-size:24px; }
+  .brand .sub{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; }
+
+  .clock-box{
+    font-family:var(--mono);
+    text-align:right;
+  }
+  .clock-box .time{ font-size:22px; color:var(--gold-soft); letter-spacing:0.02em; }
+  .clock-box .date{ font-size:11.5px; color:var(--ink-dim); text-transform:capitalize; }
+  .clock-box .hours{ font-size:11px; color:var(--ink-dim); margin-top:4px; }
+
+  /* ---------- Layout grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap:26px;
+    align-items:start;
+  }
+  @media (max-width: 860px){
+    .grid{ grid-template-columns:1fr; }
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:26px 26px 24px;
+  }
+
+  .panel h2{ font-size:15px; margin-bottom:4px; }
+  .panel .panel-desc{ font-size:12.5px; color:var(--ink-dim); margin-bottom:20px; line-height:1.5; }
+
+  /* ---------- Form ---------- */
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:7px;
+    font-family:var(--mono);
+  }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .vehicle-toggle{ display:flex; gap:10px; }
+  .vt-btn{
+    flex:1;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:13px 10px;
+    color:var(--ink-dim);
+    font-family:var(--sans);
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:all .15s ease;
+  }
+  .vt-btn svg{ width:18px; height:18px; opacity:.7; transition:opacity .15s; }
+  .vt-btn:hover{ border-color:#3a4256; }
+  .vt-btn.active{
+    background:linear-gradient(155deg, rgba(201,162,75,0.16), rgba(201,162,75,0.05));
+    border-color:var(--gold);
+    color:var(--gold-soft);
+  }
+  .vt-btn.active svg{ opacity:1; }
+
+  input[type="text"], input[type="datetime-local"]{
+    width:100%;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    color:var(--ink);
+    font-family:var(--mono);
+    font-size:14px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input::placeholder{ color:#5b6475; font-family:var(--sans); }
+  input:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(201,162,75,0.14);
+  }
+  input.err{ border-color:var(--terracota); box-shadow:0 0 0 3px rgba(214,87,63,0.14); }
+
+  .hint{ font-size:11.5px; color:var(--ink-dim); margin-top:6px; line-height:1.4; }
+  .errmsg{ font-size:12px; color:var(--terracota); margin-top:6px; display:none; font-weight:600; }
+  .errmsg.show{ display:block; }
+
+  .check-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-top:6px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .check-row input{ width:auto; accent-color:var(--gold); }
+  .check-row span{ font-size:12.5px; color:var(--ink-dim); line-height:1.4; }
+  .check-row strong{ color:var(--ink); }
+
+  .btn{
+    width:100%;
+    border:none;
+    border-radius:10px;
+    padding:14px 16px;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    transition:transform .08s ease, filter .15s ease;
+  }
+  .btn:active{ transform:scale(0.985); }
+  .btn-primary{
+    background:linear-gradient(155deg, var(--gold-soft), var(--gold));
+    color:#1a1406;
+    margin-top:8px;
+  }
+  .btn-primary:hover{ filter:brightness(1.06); }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    margin-top:10px;
+  }
+  .btn-ghost:hover{ border-color:#3a4256; color:var(--ink); }
+
+  .global-alert{
+    display:none;
+    background:rgba(214,87,63,0.12);
+    border:1px solid rgba(214,87,63,0.4);
+    color:#f0a796;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:12.5px;
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .global-alert.show{ display:block; }
+  .global-alert ul{ margin:6px 0 0; padding-left:18px; }
+
+  /* ---------- Ticket ---------- */
+  .ticket-shell{
+    position:sticky;
+    top:24px;
+  }
+
+  .ticket-placeholder{
+    border:1px dashed var(--line);
+    border-radius:14px;
+    padding:50px 24px;
+    text-align:center;
+    color:var(--ink-dim);
+    font-size:13px;
+    line-height:1.6;
+  }
+  .ticket-placeholder svg{ width:34px; height:34px; opacity:.4; margin-bottom:12px; }
+
+  .ticket{
+    display:none;
+    background:var(--paper);
+    color:var(--paper-ink);
+    border-radius:4px;
+    font-family:var(--mono);
+    position:relative;
+    box-shadow: 0 18px 40px -10px rgba(0,0,0,0.5);
+    overflow:hidden;
+  }
+  .ticket.show{ display:block; animation: drop .35s ease; }
+  @keyframes drop{ from{ opacity:0; transform:translateY(-14px);} to{opacity:1; transform:translateY(0);} }
+
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height:10px;
+    background:
+      radial-gradient(circle 6px at 10px 5px, var(--bg) 99%, transparent 100%) repeat-x;
+    background-size:20px 10px;
+  }
+  .ticket::before{ top:-1px; }
+  .ticket::after{ bottom:-1px; transform:rotate(180deg); }
+
+  .ticket-inner{ padding:26px 24px 28px; }
+
+  .t-center{ text-align:center; }
+  .t-logo{ font-size:18px; font-weight:700; letter-spacing:0.06em; }
+  .t-sub{ font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; opacity:.65; margin-top:2px; }
+
+  .t-rule{
+    border:none;
+    border-top:1px dashed rgba(38,33,25,0.35);
+    margin:16px 0;
+  }
+
+  .t-line{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-size:12.5px;
+    padding:3px 0;
+  }
+  .t-line .k{ opacity:.65; }
+  .t-line .v{ font-weight:700; text-align:right; }
+
+  .t-badge{
+    display:inline-block;
+    font-size:10px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:20px;
+    background:rgba(38,33,25,0.1);
+    margin-top:2px;
+  }
+  .t-badge.disc{ background:rgba(74,191,138,0.18); color:#1d5c41; }
+
+  .t-total{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid rgba(38,33,25,0.35);
+  }
+  .t-total .k{ font-size:12.5px; font-weight:700; }
+  .t-total .v{ font-size:21px; font-weight:700; }
+
+  .t-section-title{
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    opacity:.55;
+    margin:18px 0 8px;
+  }
+
+  .change-list{ display:flex; flex-direction:column; gap:6px; }
+  .change-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(38,33,25,0.06);
+    border-radius:6px;
+    padding:7px 10px;
+    font-size:12.5px;
+  }
+  .change-item .deno{ display:flex; align-items:center; gap:8px; }
+  .change-item .pill{
+    font-size:9.5px;
+    padding:1px 6px;
+    border-radius:10px;
+    background:var(--paper-ink);
+    color:var(--paper);
+    letter-spacing:.04em;
+  }
+
+  .t-foot{
+    text-align:center;
+    font-size:10.5px;
+    opacity:.55;
+    margin-top:18px;
+    line-height:1.6;
+  }
+  .t-barcode{
+    margin:16px auto 0;
+    height:34px;
+    width:80%;
+    background: repeating-linear-gradient(90deg, var(--paper-ink) 0px, var(--paper-ink) 2px, transparent 2px, transparent 5px);
+    opacity:.75;
+  }
+
+  .ticket-actions{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .ticket-actions .btn{ font-size:13px; padding:11px; }
+
+  /* ---------- Log ---------- */
+  .log-panel{ margin-top:26px; }
+  .log-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .log-head h2{ font-size:15px; }
+  .log-count{ font-family:var(--mono); font-size:11px; color:var(--ink-dim); }
+
+  .log-empty{ font-size:12.5px; color:var(--ink-dim); padding:10px 0; }
+
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    padding:8px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{
+    padding:11px 10px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody td.num{ font-family:var(--mono); text-align:right; }
+  .tag{
+    font-size:10.5px;
+    padding:2px 8px;
+    border-radius:20px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+  }
+
+  footer.page-foot{
+    text-align:center;
+    margin-top:40px;
+    font-size:11.5px;
+    color:var(--ink-dim);
+    line-height:1.7;
+  }
+  footer.page-foot .gold{ color:var(--gold); }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible, .vt-btn:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ticket.show{ animation:none; }
+  }
+</style>
 </head>
 <body>
+<div class="wrap">
 
-    <main>
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c9a24b" stroke-width="1.6">
+          <path d="M12 2l2.2 5.6L20 9l-4.6 3.7L16.8 19 12 15.6 7.2 19l1.4-6.3L4 9l5.8-1.4L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Atenea</h1>
+        <div class="sub">Terminal de pago · Parqueadero</div>
+      </div>
+    </div>
+    <div class="clock-box">
+      <div class="time" id="clockTime">--:--:--</div>
+      <div class="date" id="clockDate">—</div>
+      <div class="hours">Horario de atención: 5:00 a. m. – 12:00 p. m.</div>
+    </div>
+  </header>
 
-        <div class="formulario">
+  <div class="grid">
 
-            <div class="logo">
-                <h1>
-                    Parqueadero <br>
-                    Parchese
-                </h1>
-            </div>
+    <!-- FORM PANEL -->
+    <section class="panel">
+      <h2>Registrar salida del vehículo</h2>
+      <p class="panel-desc">Ingresa los datos del vehículo para calcular el tiempo de estacionamiento y el valor a pagar.</p>
 
-            <br>
+      <div class="global-alert" id="globalAlert"></div>
 
-            <!-- DATOS DEL VEHICULO -->
-
-            <div class="placas">
-
-                <label for="tipoVehiculo">
-                    Tipo de Vehículo
-                </label>
-
-                <input
-                    type="text"
-                    id="tipoVehiculo"
-                    placeholder="automovil o moto"
-                >
-
-                <label for="placa">
-                    Placa
-                </label>
-
-                <input
-                    type="text"
-                    id="placa"
-                    placeholder="ABC123"
-                >
-
-            </div>
-
-            <br>
-
-            <!-- FECHAS -->
-
-            <div class="horario">
-
-                <label for="fechaIngreso">
-                    Fecha de ingreso
-                </label>
-
-                <input
-                    type="datetime-local"
-                    id="fechaIngreso"
-                >
-
-                <label for="fechaSalida">
-                    Fecha de salida
-                </label>
-
-                <input
-                    type="datetime-local"
-                    id="fechaSalida"
-                >
-
-            </div>
-
-            <br>
-
-            <!-- DINERO DEL CLIENTE -->
-
-            <div class="horario">
-
-                <label for="dineroCliente">
-                    Dinero entregado
-                </label>
-
-                <input
-                    type="number"
-                    id="dineroCliente"
-                    placeholder="50000"
-                >
-
-            </div>
-
-            <br>
-
-            <!-- BOTON -->
-
-            <button id="calcular">
-                Calcular Pago
-            </button>
-
-            <br>
-
-            <!-- RESULTADOS -->
-
-            <div id="resultado">
-
-            </div>
-
+      <div class="field">
+        <label>Tipo de vehículo</label>
+        <div class="vehicle-toggle">
+          <button type="button" class="vt-btn active" data-tipo="auto" id="btnAuto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13M5 13h14v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4z"/><circle cx="7.5" cy="15.5" r="0.6" fill="currentColor"/><circle cx="16.5" cy="15.5" r="0.6" fill="currentColor"/></svg>
+            Automóvil
+          </button>
+          <button type="button" class="vt-btn" data-tipo="moto" id="btnMoto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M5.5 17.5h6l3-7h3.5M11.5 10.5L9 7h-2M14.5 10.5l2 4 2 .5"/></svg>
+            Moto
+          </button>
         </div>
+        <input type="hidden" id="tipoVehiculo" value="auto">
+      </div>
 
-    </main>
+      <div class="field">
+        <label for="placa">Placa del vehículo</label>
+        <input type="text" id="placa" placeholder="ABC123" maxlength="6" autocomplete="off">
+        <div class="hint">Formato colombiano: 3 letras + 3 números (autos) o 3 letras + 2 números + 1 letra (motos).</div>
+        <div class="errmsg" id="errPlaca">La placa no tiene un formato válido.</div>
+      </div>
 
-    <script src="codigo.js"></script>
+      <div class="row2">
+        <div class="field">
+          <label for="fechaIngreso">Fecha y hora de ingreso</label>
+          <input type="datetime-local" id="fechaIngreso">
+          <div class="errmsg" id="errIngreso">Hora fuera del horario de atención (5:00 a.m.–12:00 p.m.).</div>
+        </div>
+        <div class="field">
+          <label for="fechaSalida">Fecha y hora de salida</label>
+          <input type="datetime-local" id="fechaSalida">
+          <div class="errmsg" id="errSalida">La salida debe ser posterior al ingreso y dentro del horario.</div>
+        </div>
+      </div>
 
+      <label class="check-row" for="picoPlaca">
+        <input type="checkbox" id="picoPlaca">
+        <span><strong>Aplicar descuento pico y placa (25%)</strong><br>Solo disponible para automóviles con restricción de movilidad vigente ese día.</span>
+      </label>
+
+      <button class="btn btn-primary" id="btnCalcular">Calcular valor a pagar</button>
+
+      <div id="pagoSection" style="display:none;">
+        <div class="field" style="margin-top:18px;">
+          <label for="dineroRecibido">Dinero recibido del cliente</label>
+          <input type="text" id="dineroRecibido" placeholder="Ej: 50000" inputmode="numeric">
+          <div class="errmsg" id="errDinero">Ingresa un valor numérico igual o mayor al total a pagar.</div>
+        </div>
+        <button class="btn btn-primary" id="btnPagar">Generar ticket y calcular cambio</button>
+      </div>
+
+      <button class="btn btn-ghost" id="btnReset">Limpiar formulario</button>
+    </section>
+
+    <!-- TICKET PANEL -->
+    <aside class="ticket-shell">
+      <div class="ticket-placeholder" id="ticketPlaceholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16l-2-1.5L16 20l-2-1.5L12 20l-2-1.5L8 20l-2-1.5L4 20V4z"/><path d="M7 8h10M7 11h10M7 14h6"/></svg>
+        <div>El ticket de pago aparecerá aquí<br>después de calcular el valor a pagar.</div>
+      </div>
+
+      <div class="ticket" id="ticket">
+        <div class="ticket-inner">
+          <div class="t-center">
+            <div class="t-logo">ATENEA</div>
+            <div class="t-sub">Comprobante de pago</div>
+          </div>
+          <hr class="t-rule">
+          <div class="t-line"><span class="k">Fecha</span><span class="v" id="tkFecha">—</span></div>
+          <div class="t-line"><span class="k">Placa</span><span class="v" id="tkPlaca">—</span></div>
+          <div class="t-line"><span class="k">Vehículo</span><span class="v" id="tkTipo">—</span></div>
+          <div class="t-line"><span class="k">Ingreso</span><span class="v" id="tkIngreso">—</span></div>
+          <div class="t-line"><span class="k">Salida</span><span class="v" id="tkSalida">—</span></div>
+          <div class="t-line"><span class="k">Tiempo total</span><span class="v" id="tkTiempo">—</span></div>
+          <hr class="t-rule">
+          <div class="t-line"><span class="k">Tarifa por minuto</span><span class="v" id="tkTarifa">—</span></div>
+          <div class="t-line"><span class="k">Subtotal</span><span class="v" id="tkSubtotal">—</span></div>
+          <div class="t-line" id="tkDescuentoRow" style="display:none;"><span class="k">Descuento pico y placa <span class="t-badge disc">-25%</span></span><span class="v" id="tkDescuento">—</span></div>
+          <div class="t-line"><span class="k">Ajuste a múltiplo de $50</span><span class="v" id="tkAjuste">—</span></div>
+
+          <div class="t-total"><span class="k">TOTAL A PAGAR</span><span class="v" id="tkTotal">$0</span></div>
+
+          <div id="tkCambioWrap" style="display:none;">
+            <div class="t-line" style="margin-top:14px;"><span class="k">Recibido</span><span class="v" id="tkRecibido">—</span></div>
+            <div class="t-line"><span class="k">Cambio a devolver</span><span class="v" id="tkCambioTotal">—</span></div>
+            <div class="t-section-title">Desglose del cambio</div>
+            <div class="change-list" id="changeList"></div>
+          </div>
+
+          <div class="t-barcode"></div>
+          <div class="t-foot">Gracias por estacionar con Atenea<br>Conserve este comprobante</div>
+        </div>
+      </div>
+
+      <div class="ticket-actions" id="ticketActions" style="display:none;">
+        <button class="btn btn-ghost" id="btnDescargarJson">Descargar JSON</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- LOG -->
+  <section class="panel log-panel">
+    <div class="log-head">
+      <h2>Registro de transacciones</h2>
+      <span class="log-count" id="logCount">0 registros</span>
+    </div>
+    <div class="log-empty" id="logEmpty">Aún no se han registrado pagos en esta sesión.</div>
+    <div style="overflow-x:auto;">
+      <table id="logTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Tiempo (h)</th>
+            <th style="text-align:right;">Valor pagado</th>
+          </tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    Tarifas: Automóvil <span class="gold">$125</span>/min · Moto <span class="gold">$95</span>/min · Descuento pico y placa <span class="gold">25%</span><br>
+    Taller práctico — Programación para la Web I
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====================== Constantes del negocio ====================== */
+  const TARIFA = { auto: 125, moto: 95 };
+  const DESCUENTO_PICO_PLACA = 0.25;
+  const HORA_APERTURA = 5;   // 5:00 a.m.
+  const HORA_CIERRE   = 12;  // 12:00 p.m. (mediodía)
+  const DENOMINACIONES = [100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50];
+
+  const registros = []; // log en memoria de la sesión
+
+  /* ====================== Utilidades ====================== */
+  const $ = (id) => document.getElementById(id);
+
+  const fmtCOP = (n) => "$" + Math.round(n).toLocaleString("es-CO");
+
+  const fmtFechaHora = (date) =>
+    date.toLocaleString("es-CO", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+
+  // Valida formato de placa colombiana: AAA123 (carro) o AAA12A (moto)
+  function placaValida(placa, tipo){
+    const p = placa.trim().toUpperCase();
+    if(tipo === "auto"){
+      return /^[A-Z]{3}[0-9]{3}$/.test(p);
+    }
+    return /^[A-Z]{3}[0-9]{2}[A-Z]$/.test(p);
+  }
+
+  // Verifica que una fecha/hora esté dentro del horario de atención [5:00, 12:00]
+  function dentroDeHorario(date){
+    const h = date.getHours();
+    const m = date.getMinutes();
+    const minutos = h * 60 + m;
+    const apertura = HORA_APERTURA * 60;
+    const cierre = HORA_CIERRE * 60; // 12:00 pm exactas incluidas
+    return minutos >= apertura && minutos <= cierre;
+  }
+
+  // Ajusta un valor al múltiplo de 50 inmediatamente superior (a favor del parqueadero)
+  function ajustarMultiplo50(valor){
+    return Math.ceil(valor / 50) * 50;
+  }
+
+  // Calcula el desglose de cambio en denominaciones colombianas
+  function calcularCambio(totalCambio){
+    let restante = Math.round(totalCambio);
+    const desglose = [];
+    for(const d of DENOMINACIONES){
+      if(restante <= 0) break;
+      const cantidad = Math.floor(restante / d);
+      if(cantidad > 0){
+        desglose.push({ denominacion:d, cantidad });
+        restante -= cantidad * d;
+      }
+    }
+    return desglose;
+  }
+
+  function tipoBillete(d){
+    return d >= 1000 ? "Billete" : "Moneda";
+  }
+
+  /* ====================== Estado de la UI ====================== */
+  let calculoActual = null; // guarda el resultado del cálculo vigente
+
+  function setTipoVehiculo(tipo){
+    $("tipoVehiculo").value = tipo;
+    $("btnAuto").classList.toggle("active", tipo === "auto");
+    $("btnMoto").classList.toggle("active", tipo === "moto");
+  }
+
+  $("btnAuto").addEventListener("click", () => setTipoVehiculo("auto"));
+  $("btnMoto").addEventListener("click", () => setTipoVehiculo("moto"));
+
+  function mostrarAlertaGlobal(mensajes){
+    const box = $("globalAlert");
+    if(!mensajes.length){
+      box.classList.remove("show");
+      box.innerHTML = "";
+      return;
+    }
+    box.innerHTML = "<strong>Revisa los siguientes datos:</strong><ul>" +
+      mensajes.map(m => `<li>${m}</li>`).join("") + "</ul>";
+    box.classList.add("show");
+  }
+
+  function limpiarErroresCampo(){
+    ["placa","fechaIngreso","fechaSalida"].forEach(id => $(id).classList.remove("err"));
+    ["errPlaca","errIngreso","errSalida"].forEach(id => $(id).classList.remove("show"));
+  }
+
+  /* ====================== Validación principal ====================== */
+  function validarFormulario(){
+    limpiarErroresCampo();
+    const errores = [];
+
+    const tipo = $("tipoVehiculo").value;
+    const placa = $("placa").value.trim();
+    const ingresoStr = $("fechaIngreso").value;
+    const salidaStr = $("fechaSalida").value;
+
+    // Placa
+    if(!placa){
+      errores.push("La placa del vehículo es obligatoria.");
+      $("placa").classList.add("err");
+    } else if(!placaValida(placa, tipo)){
+      errores.push(`La placa "${placa.toUpperCase()}" no corresponde al formato esperado para ${tipo === "auto" ? "un automóvil (AAA123)" : "una moto (AAA12A)"}.`);
+      $("placa").classList.add("err");
+      $("errPlaca").classList.add("show");
+    }
+
+    // Fechas presentes
+    if(!ingresoStr){
+      errores.push("Debes indicar la fecha y hora de ingreso.");
+      $("fechaIngreso").classList.add("err");
+    }
+    if(!salidaStr){
+      errores.push("Debes indicar la fecha y hora de salida.");
+      $("fechaSalida").classList.add("err");
+    }
+
+    if(ingresoStr && salidaStr){
+      const ingreso = new Date(ingresoStr);
+      const salida = new Date(salidaStr);
+
+      if(isNaN(ingreso.getTime()) || isNaN(salida.getTime())){
+        errores.push("Las fechas ingresadas no son válidas.");
+      } else {
+        if(!dentroDeHorario(ingreso)){
+          errores.push("La hora de ingreso está fuera del horario de atención (5:00 a.m. – 12:00 p.m.).");
+          $("fechaIngreso").classList.add("err");
+          $("errIngreso").classList.add("show");
+        }
+        if(!dentroDeHorario(salida)){
+          errores.push("La hora de salida está fuera del horario de atención (5:00 a.m. – 12:00 p.m.).");
+          $("fechaSalida").classList.add("err");
+          $("errSalida").classList.add("show");
+        }
+        if(salida.getTime() <= ingreso.getTime()){
+          errores.push("La fecha y hora de salida debe ser posterior a la de ingreso.");
+          $("fechaSalida").classList.add("err");
+          $("errSalida").classList.add("show");
+        }
+      }
+    }
+
+    mostrarAlertaGlobal(errores);
+    return errores.length === 0;
+  }
+
+  /* ====================== Cálculo del valor a pagar ====================== */
+  function calcular(){
+    if(!validarFormulario()) return;
+
+    const tipo = $("tipoVehiculo").value;
+    const placa = $("placa").value.trim().toUpperCase();
+    const ingreso = new Date($("fechaIngreso").value);
+    const salida = new Date($("fechaSalida").value);
+    const aplicaPicoPlaca = $("picoPlaca").checked && tipo === "auto";
+
+    const minutos = Math.ceil((salida.getTime() - ingreso.getTime()) / 60000);
+    const tarifaMin = TARIFA[tipo];
+    const subtotal = minutos * tarifaMin;
+    const descuento = aplicaPicoPlaca ? subtotal * DESCUENTO_PICO_PLACA : 0;
+    const valorConDescuento = subtotal - descuento;
+    const totalAjustado = ajustarMultiplo50(valorConDescuento);
+    const ajuste = totalAjustado - valorConDescuento;
+    const horas = minutos / 60;
+
+    calculoActual = {
+      tipo, placa, ingreso, salida, minutos, horas,
+      tarifaMin, subtotal, aplicaPicoPlaca, descuento,
+      valorConDescuento, ajuste, total: totalAjustado
+    };
+
+    // Pintar el ticket (parcial, sin cambio todavía)
+    $("tkFecha").textContent = fmtFechaHora(new Date());
+    $("tkPlaca").textContent = placa;
+    $("tkTipo").textContent = tipo === "auto" ? "Automóvil" : "Moto";
+    $("tkIngreso").textContent = fmtFechaHora(ingreso);
+    $("tkSalida").textContent = fmtFechaHora(salida);
+    $("tkTiempo").textContent = `${minutos} min (${horas.toFixed(2)} h)`;
+    $("tkTarifa").textContent = fmtCOP(tarifaMin) + "/min";
+    $("tkSubtotal").textContent = fmtCOP(subtotal);
+
+    if(aplicaPicoPlaca){
+      $("tkDescuentoRow").style.display = "flex";
+      $("tkDescuento").textContent = "-" + fmtCOP(descuento);
+    } else {
+      $("tkDescuentoRow").style.display = "none";
+    }
+
+    $("tkAjuste").textContent = (ajuste > 0 ? "+" : "") + fmtCOP(ajuste);
+    $("tkTotal").textContent = fmtCOP(totalAjustado);
+
+    $("tkCambioWrap").style.display = "none";
+
+    $("ticketPlaceholder").style.display = "none";
+    $("ticket").classList.add("show");
+    $("ticketActions").style.display = "none";
+
+    $("pagoSection").style.display = "block";
+    $("dineroRecibido").value = "";
+    $("dineroRecibido").classList.remove("err");
+    $("errDinero").classList.remove("show");
+    $("dineroRecibido").focus();
+  }
+
+  /* ====================== Pago y cambio ====================== */
+  function procesarPago(){
+    if(!calculoActual) return;
+
+    const crudo = $("dineroRecibido").value.replace(/[^0-9]/g, "");
+    const recibido = parseInt(crudo, 10);
+
+    $("dineroRecibido").classList.remove("err");
+    $("errDinero").classList.remove("show");
+
+    if(!crudo || isNaN(recibido) || recibido < calculoActual.total){
+      $("dineroRecibido").classList.add("err");
+      $("errDinero").classList.add("show");
+      if(recibido < calculoActual.total && !isNaN(recibido)){
+        $("errDinero").textContent = `El dinero recibido (${fmtCOP(recibido)}) es menor al total a pagar (${fmtCOP(calculoActual.total)}).`;
+      }
+      return;
+    }
+
+    const cambioTotal = recibido - calculoActual.total;
+    const desglose = calcularCambio(cambioTotal);
+
+    $("tkCambioWrap").style.display = "block";
+    $("tkRecibido").textContent = fmtCOP(recibido);
+    $("tkCambioTotal").textContent = fmtCOP(cambioTotal);
+
+    const list = $("changeList");
+    list.innerHTML = "";
+    if(desglose.length === 0){
+      list.innerHTML = `<div class="change-item"><span>Pago exacto, sin cambio a devolver.</span></div>`;
+    } else {
+      desglose.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "change-item";
+        div.innerHTML = `
+          <span class="deno"><span class="pill">${tipoBillete(item.denominacion)}</span> ${fmtCOP(item.denominacion)}</span>
+          <span>x${item.cantidad}</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    $("ticketActions").style.display = "flex";
+
+    // Guardar registro para el log y el JSON
+    const registro = {
+      fecha: new Date().toISOString(),
+      tipoVehiculo: calculoActual.tipo === "auto" ? "Automóvil" : "Moto",
+      placa: calculoActual.placa,
+      tiempoHoras: Number(calculoActual.horas.toFixed(2)),
+      valorAPagar: calculoActual.total
+    };
+    registros.push(registro);
+    actualizarLog();
+    calculoActual.registro = registro;
+    calculoActual.recibido = recibido;
+    calculoActual.cambioTotal = cambioTotal;
+    calculoActual.desgloseCambio = desglose;
+  }
+
+  /* ====================== Log de transacciones ====================== */
+  function actualizarLog(){
+    $("logCount").textContent = registros.length + (registros.length === 1 ? " registro" : " registros");
+    if(registros.length === 0){
+      $("logEmpty").style.display = "block";
+      $("logTable").style.display = "none";
+      return;
+    }
+    $("logEmpty").style.display = "none";
+    $("logTable").style.display = "table";
+
+    const body = $("logBody");
+    body.innerHTML = "";
+    registros.slice().reverse().forEach(r => {
+      const tr = document.createElement("tr");
+      const fecha = new Date(r.fecha);
+      tr.innerHTML = `
+        <td>${fecha.toLocaleString("es-CO", {day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit"})}</td>
+        <td><span class="tag">${r.placa}</span></td>
+        <td>${r.tipoVehiculo}</td>
+        <td class="num">${r.tiempoHoras}</td>
+        <td class="num">${fmtCOP(r.valorAPagar)}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  /* ====================== Descargar JSON ====================== */
+  function descargarJson(){
+    if(!calculoActual || !calculoActual.registro) return;
+    const data = calculoActual.registro;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `atenea_${data.placa}_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /* ====================== Reset ====================== */
+  function resetFormulario(){
+    $("placa").value = "";
+    $("fechaIngreso").value = "";
+    $("fechaSalida").value = "";
+    $("picoPlaca").checked = false;
+    setTipoVehiculo("auto");
+    limpiarErroresCampo();
+    mostrarAlertaGlobal([]);
+
+    $("pagoSection").style.display = "none";
+    $("ticket").classList.remove("show");
+    $("ticketPlaceholder").style.display = "block";
+    $("ticketActions").style.display = "none";
+    calculoActual = null;
+  }
+
+  /* ====================== Reloj en vivo ====================== */
+  function actualizarReloj(){
+    const ahora = new Date();
+    $("clockTime").textContent = ahora.toLocaleTimeString("es-CO", { hour12:false });
+    $("clockDate").textContent = ahora.toLocaleDateString("es-CO", { weekday:"long", day:"2-digit", month:"long" });
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 1000);
+
+  /* ====================== Listeners ====================== */
+  $("btnCalcular").addEventListener("click", calcular);
+  $("btnPagar").addEventListener("click", procesarPago);
+  $("btnDescargarJson").addEventListener("click", descargarJson);
+  $("btnReset").addEventListener("click", resetFormulario);
+
+  $("dineroRecibido").addEventListener("keydown", (e) => {
+    if(e.key === "Enter") procesarPago();
+  });
+
+  // Prellenar con un ejemplo razonable de fecha/hora para facilitar pruebas
+  (function prellenar(){
+    const hoy = new Date();
+    const ingresoEj = new Date(hoy); ingresoEj.setHours(9, 15, 0, 0);
+    const salidaEj = new Date(hoy); salidaEj.setHours(10, 58, 0, 0);
+    const toLocalInput = (d) => {
+      const pad = (n) => String(n).padStart(2,"0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+    $("fechaIngreso").value = toLocalInput(ingresoEj);
+    $("fechaSalida").value = toLocalInput(salidaEj);
+    $("placa").value = "ABC123";
+  })();
+
+})();
+</script>
 </body>
 </html>
