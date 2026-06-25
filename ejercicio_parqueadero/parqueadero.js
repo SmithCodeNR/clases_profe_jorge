@@ -5,36 +5,37 @@ calcular.addEventListener("click", (e) =>{
     const placa = document.getElementById("placa").value
     const inicio = document.getElementById("inicio").value
     const salida = document.getElementById("salida").value
-    const resultado1 = document.getElementById("resultado1")
+    const usuario = document.getElementById("usuario")
+    const logo = document.getElementById("logo")
+    const pagos = document.getElementById("pagos")
     const precio = valor(tipoVehiculo, tiempo(inicio, salida))
     const desc = restriccion(inicio, placa, precio)
     //vamos a mostrar los datos en el html
-    resultado1.innerHTML= `
+    logo.innerHTML=`
     <h2>DATOS REGISTRADOS</H2> 
+    `
+    usuario.innerHTML= `
     <p><strong>Tipo de vehiculo:</strong> ${tipoVehiculo}</p>
     <p><strong>Placa del vehiculo:</strong> ${placa}</p>
     <p><strong>Fecha de entrada:</strong> ${inicio}</p>
     <p><strong>Fecha de salida:</strong> ${salida}</p>
-    <p><strong>descuento:</strong> ${restriccion(inicio, placa,valor(tipoVehiculo,tiempo(inicio,salida)))}</p>
-    <p><strong>Total a Pagar:</strong> ${pagoDescuento(precio, desc)}</p>
+    
+    `
+    pagos.innerHTML = `
+    <p class= "pagoSinDescuento"><strong>Pago sin descuento:</strong> ${multiplos(precio, pagoDescuento(precio,desc))}</p>
+    <p><strong>descuento del 25%:</strong> ${restriccion(inicio, placa,valor(tipoVehiculo,tiempo(inicio,salida)))}</p>
+    <p class = "pagoConDescuento"><strong>Pago con Descuento:</strong> ${pagoDescuento(precio, desc)}</p>
     <input id="plata"  type="number" placeholder="INGRESE SU DINERO" required>
     `
-    resultado1.style.display = "flex"
-    resultado1.style.flexDirection = "column"
-    resultado1.style.backgroundColor ="rgb(41, 44, 56)"
-    resultado1.style.border = "2px solid rgb(4, 4, 4)"
-    resultado1.style.padding = "20px"
-    resultado1.style.borderRadius = "10px"
-    resultado1.style.textAlign = "center"
-    resultado1.style.maxWidth = "600px"
-    resultado1.style.minWidth = "400px"
-    resultado1.style.color = "white"
+    pagos.style.textAlign = "center"
+
+
 
     console.log(restriccion(inicio, placa,valor(tipoVehiculo,tiempo(inicio,salida))))
     validacion(placa, tipoVehiculo)
     console.log(tiempo(inicio, salida))
     console.log(valor(tipoVehiculo, tiempo(inicio, salida)))
-    
+    console.log(multiplos(precio,pagoDescuento(precio, desc)))
     console.log(pagoDescuento(precio, desc))
 })
 
@@ -91,4 +92,29 @@ function restriccion(inicio, placa,precio){
 function pagoDescuento(precio,desc){
     const descuentoPago = precio - desc
     return descuentoPago
+}
+//multiplos de 50
+function multiplos(precio,pagoDescuento){
+    const NOmultiplo = precio%50
+    const multiplosDesc =pagoDescuento%50
+    if(NOmultiplo<50 && NOmultiplo>0){
+        const coeficiente = 50-NOmultiplo
+        const totalMultiplo = precio + coeficiente
+        return totalMultiplo
+    }
+    else if(NOmultiplo ==50 || NOmultiplo==0){
+        return precio
+    }
+    else if (multiplosDesc<50 && multiplosDesc>0){
+        const coeficiente = 50-multiplosDesc
+        const totalMDesc = pagoDescuento + coeficiente
+        return totalMDesc
+    }
+    else if (multiplosDesc==50 || multiplosDesc==0){
+        return pagoDescuento
+    }
+    else{
+        return 0
+    }
+    
 }

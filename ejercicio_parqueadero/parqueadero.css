@@ -27,6 +27,7 @@ main{
     align-items: center;
     justify-content: center;
     width: 100%;
+    gap: 20px;
 }
 .formulario{
     display: flex;
@@ -122,4 +123,18 @@ input::placeholder{
     text-align: center;
     border-radius: 10px;
     border: 2px solid black;
+}
+.datos{
+    border-bottom: 2px solid gray;
+    width: 100%;
+}
+.registrados{
+    color: gray;
+    width: 100%;
+}
+.pagoSinDescuento{
+    color: brown;
+}
+.pagoConDescuento{
+    color: green;
 }
