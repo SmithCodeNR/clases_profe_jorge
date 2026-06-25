@@ -1,59 +1,95 @@
 body{
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-image: url(fondo.png);
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
-h1{
+body::before{
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    background-color: rgba(0, 0, 0, 0.655);
 
+    z-index: -1;
 }
 main{
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
-.logo{
-    background-color: rgb(47, 48, 53);
-    color: aliceblue;
-    text-align: center;
-    border-radius: 50%;
-    border: 2px solid black;
-    font-size: 15px;
-    padding: 10px;
-}
-
 .formulario{
-    position: absolute;
-    left: 35%;
-    top: 100px;
     display: flex;
     flex-direction: column;
     border: 2px solid rgb(4, 4, 4);
     padding: 20px;
     align-items: center;
-    background-color: rgba(61, 64, 74, 0.905);
+    background-color: rgb(41, 44, 56);
     border-radius: 10px;
-    max-width: 400px;
+    max-width: 600px;
     min-width: 400px;
 }
+.logo{
+    width: 100%;
+    border-bottom: 2px solid gray;
+    color: rgb(176, 180, 184);
+    text-align: center;
+    font-size: 15px;
+}
 .placas{
+    border-bottom: 2px solid gray;
+}
+.vehiculo{
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, 200px);
+    margin: 30px;
+}
+.tipo{
     display: flex;
     flex-direction: column;
     gap: 20px;
-    border: 2px solid;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: rgb(103, 103, 103);
-    align-items: center;
+    text-align: center;
 }
-.horario{
+.placa{
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+.horario{
+    border-bottom: 2px solid gray;
+}
+.fechas{
+    display: grid;
     gap: 10px;
-    align-items: center;
-    border: 2px solid ;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: rgb(103, 103, 103);
+    grid-template-columns: repeat(2, 200px);
+    margin: 30px;
+}
+.inicio{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+.salida{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+label{
+    color:gray;
 }
 input{
     background-color: rgb(163, 163, 163);
@@ -62,9 +98,10 @@ input{
     border-radius: 10px;
     border: 2px solid black;
 }
-label{
+input::placeholder{
     color: black;
 }
+
 #calcular{
     background-color: rgb(103, 103, 103);
     padding: 10px;
@@ -76,6 +113,13 @@ label{
     cursor: pointer;
     background-color: rgb(47, 48, 53);
     color: rgb(188, 188, 188);
-    transform: translateY(10px);
+    transform: translateY(-3px);
     font-weight: bold;
+}
+#tipoVehiculo{
+    background-color: rgb(163, 163, 163);
+    color: black;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid black;
 }

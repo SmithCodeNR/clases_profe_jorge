@@ -1,295 +1,94 @@
-// =====================================
-// BOTON CALCULAR
-// =====================================
+//vamos a llamar datos 
+const calcular = document.getElementById("calcular")
+calcular.addEventListener("click", (e) =>{
+    const tipoVehiculo = document.getElementById("tipoVehiculo").value
+    const placa = document.getElementById("placa").value
+    const inicio = document.getElementById("inicio").value
+    const salida = document.getElementById("salida").value
+    const resultado1 = document.getElementById("resultado1")
+    const precio = valor(tipoVehiculo, tiempo(inicio, salida))
+    const desc = restriccion(inicio, placa, precio)
+    //vamos a mostrar los datos en el html
+    resultado1.innerHTML= `
+    <h2>DATOS REGISTRADOS</H2> 
+    <p><strong>Tipo de vehiculo:</strong> ${tipoVehiculo}</p>
+    <p><strong>Placa del vehiculo:</strong> ${placa}</p>
+    <p><strong>Fecha de entrada:</strong> ${inicio}</p>
+    <p><strong>Fecha de salida:</strong> ${salida}</p>
+    <p><strong>descuento:</strong> ${restriccion(inicio, placa,valor(tipoVehiculo,tiempo(inicio,salida)))}</p>
+    <p><strong>Total a Pagar:</strong> ${pagoDescuento(precio, desc)}</p>
+    <input id="plata"  type="number" placeholder="INGRESE SU DINERO" required>
+    `
+    resultado1.style.display = "flex"
+    resultado1.style.flexDirection = "column"
+    resultado1.style.backgroundColor ="rgb(41, 44, 56)"
+    resultado1.style.border = "2px solid rgb(4, 4, 4)"
+    resultado1.style.padding = "20px"
+    resultado1.style.borderRadius = "10px"
+    resultado1.style.textAlign = "center"
+    resultado1.style.maxWidth = "600px"
+    resultado1.style.minWidth = "400px"
+    resultado1.style.color = "white"
 
-const btnCalcular = document.getElementById("calcular");
+    console.log(restriccion(inicio, placa,valor(tipoVehiculo,tiempo(inicio,salida))))
+    validacion(placa, tipoVehiculo)
+    console.log(tiempo(inicio, salida))
+    console.log(valor(tipoVehiculo, tiempo(inicio, salida)))
+    
+    console.log(pagoDescuento(precio, desc))
+})
 
-btnCalcular.addEventListener("click", function () {
 
-    // =====================================
-    // CAPTURAR DATOS
-    // =====================================
-
-    const tipoVehiculo = document
-        .getElementById("tipoVehiculo")
-        .value
-        .toLowerCase()
-        .trim();
-
-    const placa = document
-        .getElementById("placa")
-        .value
-        .toUpperCase()
-        .trim();
-
-    const fechaIngreso = document
-        .getElementById("fechaIngreso")
-        .value;
-
-    const fechaSalida = document
-        .getElementById("fechaSalida")
-        .value;
-
-    const dineroCliente = Number(
-        document.getElementById("dineroCliente").value
-    );
-
-    // =====================================
-    // VALIDAR CAMPOS VACIOS
-    // =====================================
-
-    if (
-        tipoVehiculo === "" ||
-        placa === "" ||
-        fechaIngreso === "" ||
-        fechaSalida === "" ||
-        dineroCliente <= 0
-    ) {
-        alert("Debe completar todos los campos");
-        return;
+//aqui lo va a calcular el tiempo en minutos
+function tiempo(inicio, salida){
+    const minutos =(Date.parse(salida) - Date.parse(inicio))/(1000*60)
+    return minutos
+}
+//ahora vamos a multiplacar los minutos con el tipo de vehiculo 
+function valor(tipoVehiculo, tiempo){
+    if(tipoVehiculo=="auto"){
+        const precio =tiempo*125
+        return precio
+    }
+    else if (tipoVehiculo=="moto"){
+        const precio = tiempo*95
+        return precio
     }
 
-    // =====================================
-    // VALIDAR TIPO VEHICULO
-    // =====================================
-
-    if (
-        tipoVehiculo !== "automovil" &&
-        tipoVehiculo !== "moto"
-    ) {
-        alert("Tipo de vehículo inválido");
-        return;
+}
+//ahora vamos hacer q se cumplan los parametros de la placa 
+const patron = /^[A-Za-z]{3}[0-9]{3}$/
+const patron2 = /^[A-Za-z]{3}[0-9]{2}[A-Za-z]{1}$/
+function validacion(placa, tipoVehiculo){
+    if (!patron.test(placa) && tipoVehiculo=="auto") {
+        alert("Debe ingresar 3 letras y 3 números. \nEjemplo: ABC123")
+        return 
     }
-
-    // =====================================
-    // VALIDAR PLACAS
-    // =====================================
-
-    const placaAuto = /^[A-Z]{3}[0-9]{3}$/;
-
-    const placaMoto = /^[A-Z]{3}[0-9]{2}[A-Z]$/;
-
-    if (tipoVehiculo === "automovil") {
-
-        if (!placaAuto.test(placa)) {
-            alert("Placa de automóvil inválida");
-            return;
-        }
-
+    else if (!patron2.test(placa) && tipoVehiculo == "moto"){
+        alert("Debe ingresar 3 letras, 2 numeros y 1 letra.\nEjemplo: ABC12G")
+        return
     }
-
-    if (tipoVehiculo === "moto") {
-
-        if (!placaMoto.test(placa)) {
-            alert("Placa de moto inválida");
-            return;
-        }
-
+}
+//pico y placa
+function restriccion(inicio, placa,precio){
+    const fecha = new Date(inicio)
+    const digito = placa.split("")
+    const picoPlacaPar =[6,7,8,9,0]
+    const picoPlacaImpares = [1,2,3,4,5]
+    if (fecha.getDate() % 2 == 0 && picoPlacaPar.includes(parseInt(digito[5]))){
+        const descuento = precio * 0.25
+        return descuento
     }
-
-    // =====================================
-    // CONVERTIR FECHAS
-    // =====================================
-
-    const ingreso = new Date(fechaIngreso);
-    const salida = new Date(fechaSalida);
-
-    // =====================================
-    // VALIDAR FECHAS
-    // =====================================
-
-    if (salida <= ingreso) {
-        alert(
-            "La fecha de salida debe ser mayor que la fecha de ingreso"
-        );
-        return;
+    else if (fecha.getDate() % 2 !==0 && picoPlacaImpares.includes(parseInt(digito[5]))){
+        const descuento = precio *0.25
+        return descuento
     }
-
-    // =====================================
-    // VALIDAR HORARIO
-    // =====================================
-
-    const horaIngreso = ingreso.getHours();
-    const horaSalida = salida.getHours();
-
-    if (horaIngreso < 5 || horaIngreso >= 12) {
-
-        alert(
-            "La hora de ingreso debe estar entre 5:00 AM y 12:00 PM"
-        );
-
-        return;
+    else{
+        return 0
     }
-
-    if (horaSalida < 5 || horaSalida >= 12) {
-
-        alert(
-            "La hora de salida debe estar entre 5:00 AM y 12:00 PM"
-        );
-
-        return;
-    }
-
-    // =====================================
-    // CALCULAR TIEMPO
-    // =====================================
-
-    const diferencia = salida - ingreso;
-
-    const minutos =
-        diferencia / (1000 * 60);
-
-    // =====================================
-    // TARIFA
-    // =====================================
-
-    let tarifa;
-
-    if (tipoVehiculo === "automovil") {
-        tarifa = 125;
-    } else {
-        tarifa = 95;
-    }
-
-    // =====================================
-    // CALCULAR TOTAL
-    // =====================================
-
-    let total = minutos * tarifa;
-
-    // =====================================
-    // PICO Y PLACA
-    // =====================================
-
-    const diaMes = ingreso.getDate();
-
-    const ultimoDigito =
-        parseInt(
-            placa.charAt(
-                placa.length - 1
-            )
-        );
-
-    let tienePicoPlaca = false;
-
-    // Día par y placa par
-
-    if (
-        diaMes % 2 === 0 &&
-        ultimoDigito % 2 === 0
-    ) {
-        tienePicoPlaca = true;
-    }
-
-    // Día impar y placa impar
-
-    if (
-        diaMes % 2 !== 0 &&
-        ultimoDigito % 2 !== 0
-    ) {
-        tienePicoPlaca = true;
-    }
-
-    // =====================================
-    // DESCUENTO
-    // =====================================
-
-    if (
-        tipoVehiculo === "automovil" &&
-        tienePicoPlaca
-    ) {
-        total = total * 0.75;
-    }
-
-    // =====================================
-    // AJUSTAR A MULTIPLOS DE 50
-    // =====================================
-
-    total =
-        Math.ceil(total / 50) * 50;
-
-    // =====================================
-    // VALIDAR DINERO
-    // =====================================
-
-    if (dineroCliente < total) {
-
-        alert(
-            `Faltan $${total - dineroCliente}`
-        );
-
-        return;
-    }
-
-    // =====================================
-    // CALCULAR CAMBIO
-    // =====================================
-
-    let cambio =
-        dineroCliente - total;
-
-    let cambioOriginal =
-        cambio;
-
-    const denominaciones = [
-        100000,
-        50000,
-        20000,
-        10000,
-        5000,
-        2000,
-        1000,
-        500,
-        200,
-        100,
-        50
-    ];
-
-    let detalleCambio = "";
-
-    for (let i = 0; i < denominaciones.length; i++) {
-
-        let cantidad =
-            Math.floor(
-                cambio / denominaciones[i]
-            );
-
-        if (cantidad > 0) {
-
-            detalleCambio +=
-                `${cantidad} x $${denominaciones[i]}<br>`;
-
-            cambio =
-                cambio % denominaciones[i];
-        }
-
-    }
-
-    // =====================================
-    // MOSTRAR RESULTADOS
-    // =====================================
-
-    document
-        .getElementById("resultado")
-        .innerHTML = `
-
-        <h2>Total a pagar: $${total}</h2>
-
-        <p>
-            Tiempo:
-            ${minutos.toFixed(0)}
-            minutos
-        </p>
-
-        <p>
-            Cambio:
-            $${cambioOriginal}
-        </p>
-
-        <h3>Devolver:</h3>
-
-        ${detalleCambio}
-
-    `;
-
-});
+}
+//pago con descuento del pico y placa 
+function pagoDescuento(precio,desc){
+    const descuentoPago = precio - desc
+    return descuentoPago
+}
