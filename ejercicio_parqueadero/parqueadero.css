@@ -128,13 +128,42 @@ input::placeholder{
     border-bottom: 2px solid gray;
     width: 100%;
 }
+.datosBOTON{
+    width: 100%;
+}
 .registrados{
     color: gray;
     width: 100%;
+}
+.input_pago{
+    color: gray;
+    width: 100%;
+    padding: 20px;
 }
 .pagoSinDescuento{
     color: brown;
 }
 .pagoConDescuento{
     color: green;
+}
+.clasebotton{
+    color: gray;
+    width: 100%;
+    padding: 20px;
+    align-items: center;
+    
+}
+.confirmarPago{
+    background-color: rgb(103, 103, 103);
+    padding: 10px;
+    color: black;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+.confirmarPago:hover{
+    cursor: pointer;
+    background-color: rgb(47, 48, 53);
+    color: rgb(188, 188, 188);
+    transform: translateY(-3px);
+    font-weight: bold;
 }
